@@ -8,6 +8,7 @@ on:
 env:
   ACR_REGISTRY: ubiguregistry.azurecr.io
   APP_NAME: ubigu-exercise
+  RESOURCE_GROUP: ubigu-exercise
 
 jobs:
   build-and-deploy:
@@ -17,6 +18,12 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
+
+    - name: Debug GitHub Context
+      run: |
+        echo "Running on branch: ${{ github.ref }}"
+        echo "ACR_REGISTRY value: ${{ env.ACR_REGISTRY }}"
+        echo "APP_NAME value: ${{ env.APP_NAME }}
 
     - name: Log in to Azure
       uses: azure/login@v1
@@ -34,7 +41,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        file: ./Dockerfile  # Changed from 'dockerfile' to 'file'
+        file: ./Dockerfile
         push: true
         tags: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ github.sha }}, ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:latest
 
@@ -48,4 +55,4 @@ jobs:
       uses: azure/CLI@v1
       with:
         inlineScript: |
-          az webapp ssh --resource-group ubigu-exercise --name ${{ env.APP_NAME }} --command "npm run db-migrate:prod"
+          az webapp ssh --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }} --command "npm run db-migrate:prod"
