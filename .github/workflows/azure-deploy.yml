@@ -1,0 +1,51 @@
+name: Build and deploy to Azure
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  ACR_REGISTRY: ubiguregistry.azurecr.io
+  APP_NAME: ubigu-exercise
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Log in to ACR
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.ACR_REGISTRY }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile  # Changed from 'dockerfile' to 'file'
+        push: true
+        tags: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ github.sha }}, ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:latest
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.APP_NAME }}
+        images: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ github.sha }}
+
+    - name: Run database migrations
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          az webapp ssh --resource-group ubigu-exercise --name ${{ env.APP_NAME }} --command "npm run db-migrate:prod"

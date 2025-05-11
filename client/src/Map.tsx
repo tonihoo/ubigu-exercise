@@ -10,6 +10,12 @@ import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
 import { ReactNode, useEffect, useRef, useState } from "react";
+import { register } from 'ol/proj/proj4';
+import proj4 from 'proj4';
+
+// Define the Finnish coordinate system
+proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs");
+register(proj4);
 
 interface Props {
   children?: ReactNode;
@@ -26,8 +32,9 @@ export function Map({ children, onMapClick, features }: Props) {
    */
   const [olView] = useState(() => {
     return new View({
-      center: [2659167.020281517, 9632038.56757201],
-      zoom: 5,
+      center: [460000, 7125000],
+      zoom: 7,
+      projection: 'EPSG:3067',
       multiWorld: false,
       enableRotation: false,
     });
@@ -72,10 +79,17 @@ export function Map({ children, onMapClick, features }: Props) {
 
   /** Listen for changes in the 'features' property */
   useEffect(() => {
-    if (!features || !features.length) return;
     const layers = olMap.getLayers().getArray();
 
     const source = (layers[1] as VectorLayer<VectorSource>).getSource();
+
+    // Clear existing features
+    source?.clear();
+
+    // Skip adding new features if none provided
+    if (!features || !features.length) return;
+
+    // Add new features
     const olFeatures = features.map(
       (geometry) =>
         new Feature({
