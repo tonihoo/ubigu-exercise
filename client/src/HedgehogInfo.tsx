@@ -16,6 +16,13 @@ interface Hedgehog {
   };
 }
 
+// Gender translation map
+const genderTranslations: Record<string, string> = {
+  female: 'Naaras',
+  male: 'Uros',
+  unknown: 'Tuntematon'
+};
+
 export function HedgehogInfo({ hedgehogId }: Props) {
   const [hedgehog, setHedgehog] = useState<Hedgehog | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,14 +63,17 @@ export function HedgehogInfo({ hedgehogId }: Props) {
         margin: "1em 0em 1em 0em",
         padding: "1em",
       }}
+      data-cy="hedgehog-detail"
     >
       {loading ? (
         <Typography>Loading...</Typography>
       ) : hedgehog ? (
         <>
           <Typography variant="h6">{hedgehog.name}</Typography>
-          <Typography>Ikä: {hedgehog.age}</Typography>
-          <Typography>Sukupuoli: {hedgehog.gender}</Typography>
+          <Typography data-cy="hedgehog-age-display">Ikä: {hedgehog.age}</Typography>
+          <Typography data-cy="hedgehog-gender-display">
+            Sukupuoli: {genderTranslations[hedgehog.gender] || hedgehog.gender}
+          </Typography>
           <Typography>
             Sijainti: E {hedgehog.location.coordinates[0].toFixed(0)}, N {hedgehog.location.coordinates[1].toFixed(0)}
           </Typography>
