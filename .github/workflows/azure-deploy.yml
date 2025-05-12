@@ -1,4 +1,4 @@
-name: Build and deploy to Azure
+name: Build, Test and Deploy to Azure
 
 on:
   push:
@@ -11,7 +11,26 @@ env:
   RESOURCE_GROUP: ubigu-exercise
 
 jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Start Docker services
+        run: docker-compose up -d client server db
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v5
+        with:
+          spec: cypress/e2e/hedgehog-form.cy.js
+          wait-on: 'http://localhost:8080, http://localhost:3003/api/v1/health'
+          wait-on-timeout: 120
+
   build-and-deploy:
+    name: Build and Deploy
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
