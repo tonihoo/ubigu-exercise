@@ -18,8 +18,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Start Docker services
-        run: docker compose up -d client server db
+      - name: Start Docker services with debug logs
+        run: |
+          docker compose config
+          docker compose up -d
+          docker compose ps
+          echo "Waiting for services to initialize..."
+          sleep 30
+          docker compose logs
+
+      - name: Check database initialization
+        run: |
+          docker compose exec -T db psql -U db_dev_user -d db_dev -c "\dt" || echo "Cannot list tables!"
+
+      - name: Check database connection
+        run: |
+          docker compose exec -T db psql -U db_dev_user -d db_dev -c "SELECT 1" || echo "DB connection failed!"
+          docker compose exec -T server curl -f http://localhost:3003/api/v1/health || echo "Server health check failed!"
+
+      - name: Inspect network connectivity between containers
+        run: |
+          echo "Testing server -> db connectivity:"
+          docker compose exec -T server curl -v db:5432 || echo "Server can't reach DB!"
+          echo "Testing network configuration:"
+          docker network ls
+          docker network inspect $(docker network ls --filter name=ubigu-exercise --format "{{.ID}}")
 
       - name: Cypress run
         uses: cypress-io/github-action@v5
