@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "cypress": "^14.3.3"
+  },
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run",
+    "dev:test": "start-server-and-test dev http://localhost:8080 cypress:open"
+  }
+}
