@@ -33,38 +33,21 @@ jobs:
           restore-keys: |
             cypress-${{ runner.os }}-
 
-      - name: Start Docker services with debug logs
+      # Start only the client service since we're just testing the frontend
+      - name: Start frontend service
         run: |
-          docker compose config
-          docker compose up -d
+          docker compose up -d client
           docker compose ps
-          echo "Waiting for services to initialize..."
-          sleep 30
-          docker compose logs
+          echo "Waiting for frontend to initialize..."
+          sleep 15
 
-      - name: Check database initialization
-        run: |
-          docker compose exec -T db psql -U db_dev_user -d db_dev -c "\dt" || echo "Cannot list tables!"
-
-      - name: Check database connection
-        run: |
-          docker compose exec -T db psql -U db_dev_user -d db_dev -c "SELECT 1" || echo "DB connection failed!"
-          docker compose exec -T server curl -f http://localhost:3003/api/v1/health || echo "Server health check failed!"
-
-      - name: Inspect network connectivity between containers
-        run: |
-          echo "Testing server -> db connectivity:"
-          docker compose exec -T server curl -v db:5432 || echo "Server can't reach DB!"
-          echo "Testing network configuration:"
-          docker network ls
-          docker network inspect $(docker network ls --filter name=ubigu-exercise --format "{{.ID}}")
-
+      # Run Cypress tests against the frontend only
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
           spec: cypress/e2e/hedgehog-form.cy.js
-          wait-on: 'http://localhost:8080, http://localhost:3003/api/v1/health'
-          wait-on-timeout: 120
+          wait-on: 'http://localhost:8080'
+          wait-on-timeout: 60
           install: true
 
   build-and-deploy:

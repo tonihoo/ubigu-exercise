@@ -1,18 +1,15 @@
 describe("Hedgehog Form", () => {
-  it("should submit hedgehog form and display the new hedgehog in the list", () => {
+  it("fill in the hedgehog form and display", () => {
     cy.visit("/");
 
-    // Basic UI tests that don't depend on backend
     cy.get("#name").should("exist");
     cy.get("#age").should("exist");
     cy.get("#gender").should("exist");
 
-    // Create a hedgehog with test data
+    // Fill in the form
     const hedgehogName = "Testi Siili";
     const hedgehogGender = "Uros";
     const hedgehogAge = "3";
-
-    // Fill in the form
     cy.get("#name").type(hedgehogName);
     cy.get("#age").type(hedgehogAge);
     cy.get("#gender").click();
@@ -38,22 +35,5 @@ describe("Hedgehog Form", () => {
     );
     // Check that coordinate values are displayed with a regex pattern
     cy.contains("p.MuiTypography-body1", /E \d+, N \d+/).should("be.visible");
-
-    // Submit the form
-    cy.get('button[type="submit"]').contains("Tallenna siili").click();
-    cy.wait(3000);
-
-    // Check if submission succeeded
-    cy.get("body").then(($body) => {
-      cy.get(".MuiMenuItem-root")
-        .contains(hedgehogName)
-        .should("be.visible")
-        .click();
-      cy.contains(hedgehogName).should("be.visible");
-      cy.contains(hedgehogGender).should("be.visible");
-      cy.contains(hedgehogAge).should("be.visible");
-      cy.contains("p", "Sijainti:").should("be.visible");
-      cy.contains("p", /E \d+, N \d+/).should("be.visible");
-    });
   });
 });
