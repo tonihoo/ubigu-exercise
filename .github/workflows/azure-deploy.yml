@@ -65,8 +65,7 @@ jobs:
           spec: cypress/e2e/hedgehog-form.cy.js
           wait-on: 'http://localhost:8080, http://localhost:3003/api/v1/health'
           wait-on-timeout: 120
-          install: false
-          cache-key: ''
+          install: true
 
   build-and-deploy:
     name: Build and Deploy
