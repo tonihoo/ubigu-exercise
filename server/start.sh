@@ -10,15 +10,23 @@ fi
 
 # Create node_modules symlink for global modules if needed
 if [ ! -d ./node_modules/tsconfig-paths ]; then
-  echo "Setting up tsconfig-paths module link..."
-  mkdir -p ./node_modules
   ln -sf /usr/local/lib/node_modules/tsconfig-paths ./node_modules/
 fi
 
-# Run migration without requiring tsconfig-paths module
+# Make sure the shared module dependencies are visible
+echo "Setting up shared module access..."
+mkdir -p /app/server/node_modules/@shared
+ln -sf /app/shared/dist /app/server/node_modules/@shared/dist
+
+# Install zod directly if needed
+echo "Ensuring zod is installed..."
+cd /app/shared && npm list zod || npm install zod
+cd /app/server
+
+# Run migrations
 echo "Running migrations..."
 PGOPTIONS='-c search_path=app,public' node dist/migration.js
 
-# Start the application with path resolution
+# Start the application
 echo "Starting application..."
-NODE_PATH=/usr/local/lib/node_modules NODE_OPTIONS="--require /usr/local/lib/node_modules/tsconfig-paths/register" node dist/app.js
+NODE_PATH=/app/shared/node_modules:/app/server/node_modules:/usr/local/lib/node_modules NODE_OPTIONS="--require tsconfig-paths/register" node dist/app.js
