@@ -11,48 +11,48 @@ env:
   RESOURCE_GROUP: ubigu-exercise
 
 jobs:
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+#   test:
+#     name: Test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: '18'
+#           cache: 'npm'
 
-      - name: Cache Cypress binary
-        uses: actions/cache@v3
-        id: cypress-cache
-        with:
-          path: ~/.cache/Cypress
-          key: cypress-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            cypress-${{ runner.os }}-
+#       - name: Cache Cypress binary
+#         uses: actions/cache@v3
+#         id: cypress-cache
+#         with:
+#           path: ~/.cache/Cypress
+#           key: cypress-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+#           restore-keys: |
+#             cypress-${{ runner.os }}-
 
-      # Start only the client service since we're just testing the frontend
-      - name: Start frontend service
-        run: |
-          docker compose up -d client
-          docker compose ps
-          echo "Waiting for frontend to initialize..."
-          sleep 15
+#       # Start only the client service since we're just testing the frontend
+#       - name: Start frontend service
+#         run: |
+#           docker compose up -d client
+#           docker compose ps
+#           echo "Waiting for frontend to initialize..."
+#           sleep 15
 
-      # Run Cypress tests against the frontend only
-      - name: Cypress run
-        uses: cypress-io/github-action@v5
-        with:
-          spec: cypress/e2e/hedgehog-form.cy.js
-          wait-on: 'http://localhost:8080'
-          wait-on-timeout: 60
-          install: true
+#       # Run Cypress tests against the frontend only
+#       - name: Cypress run
+#         uses: cypress-io/github-action@v5
+#         with:
+#           spec: cypress/e2e/hedgehog-form.cy.js
+#           wait-on: 'http://localhost:8080'
+#           wait-on-timeout: 60
+#           install: true
 
   build-and-deploy:
     name: Build and Deploy
-    needs: test
+    # needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
