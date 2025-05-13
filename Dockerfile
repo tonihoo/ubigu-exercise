@@ -40,7 +40,7 @@ WORKDIR ${APPDIR}/server
 COPY server/package*.json ./
 RUN npm ci
 
-RUN npm install -D tsconfig-paths tsc-alias
+RUN npm install tsconfig-paths tsc-alias
 
 COPY server ./
 RUN npm run build
@@ -70,7 +70,7 @@ COPY --from=client-build ${APPDIR}/client/dist ./static
 COPY --from=base ${APPDIR}/shared/dist /app/shared/dist
 
 # Install tsconfig-paths in production
-RUN npm install tsconfig-paths
+RUN npm install -g tsconfig-paths
 
 # Create a runtime tsconfig paths file
 RUN echo '{\
