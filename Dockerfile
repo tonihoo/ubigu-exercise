@@ -69,6 +69,14 @@ COPY --from=client-build ${APPDIR}/client/dist ./static
 # After copying server files, also copy shared files
 COPY --from=base ${APPDIR}/shared/dist /app/shared/dist
 
+# Install shared module dependencies
+COPY --from=base ${APPDIR}/shared/package*.json /app/shared/
+WORKDIR /app/shared
+RUN npm ci --only=production
+
+# Return to server directory
+WORKDIR ${APPDIR}/server
+
 # Install tsconfig-paths in production
 RUN npm install -g tsconfig-paths
 
