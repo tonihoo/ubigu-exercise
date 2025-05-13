@@ -60,6 +60,10 @@ jobs:
       uses: docker/setup-buildx-action@v2
       with:
         driver: docker-container
+        install: true
+
+    - name: Show Buildx builders
+      run: docker buildx ls
 
     - name: Debug GitHub Context
       run: |
