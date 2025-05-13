@@ -103,11 +103,6 @@ jobs:
         push: true
         tags: ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:${{ github.sha }}, ${{ env.ACR_REGISTRY }}/${{ env.APP_NAME }}:latest
 
-    - name: Move cache
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
