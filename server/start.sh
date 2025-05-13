@@ -8,4 +8,4 @@ if [ "$PG_DATABASE" != "postgres" ]; then
   echo "Database $PG_DATABASE created or already exists"
 fi
 
-npm run db-migrate:prod && npm start
+npm run db-migrate:prod && NODE_OPTIONS="--require tsconfig-paths/register" node -r tsconfig-paths/register dist/app.js

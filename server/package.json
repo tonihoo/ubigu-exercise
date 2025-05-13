@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node -r tsconfig-paths/register dist/app.js",
     "dev": "node-dev -r tsconfig-paths/register src/app.ts",
     "test": "echo \"No tests specified\"",

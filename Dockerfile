@@ -40,6 +40,8 @@ WORKDIR ${APPDIR}/server
 COPY server/package*.json ./
 RUN npm ci
 
+RUN npm install -D tsconfig-paths tsc-alias
+
 COPY server ./
 RUN npm run build
 RUN rm -r src
@@ -64,6 +66,22 @@ RUN npm ci --only=production
 COPY --from=server-build ${APPDIR}/server ./
 COPY --from=client-build ${APPDIR}/client/dist ./static
 
+# After copying server files, also copy shared files
+COPY --from=base ${APPDIR}/shared/dist /app/shared/dist
+
+# Install tsconfig-paths in production
+RUN npm install tsconfig-paths
+
+# Create a runtime tsconfig paths file
+RUN echo '{\
+  "compilerOptions": {\
+    "baseUrl": ".",\
+    "paths": {\
+      "@shared/*": ["/app/shared/dist/*"]\
+    }\
+  }\
+}' > /app/server/tsconfig.paths.json
+
 # Expose the port that Azure App Service expects
 EXPOSE 8080
 
@@ -76,4 +94,5 @@ RUN apk add --no-cache postgresql-client
 COPY server/start.sh /app/server/start.sh
 RUN chmod +x /app/server/start.sh
 
-CMD ["/app/server/start.sh"]
+# Update CMD to use the paths
+CMD ["/bin/sh", "-c", "/app/server/start.sh"]
