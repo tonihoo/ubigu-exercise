@@ -29,7 +29,7 @@ export default function HedgeHogList({
         const json = await res.json();
         setHedgehogs(json?.hedgehogs || []);
       } catch (err) {
-        console.error(`Error while fetching hedgehogs:`, err);
+        console.error(`Error while fetching hedgehogs: ${err}`);
       }
     };
 

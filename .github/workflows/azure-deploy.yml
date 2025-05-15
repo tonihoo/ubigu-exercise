@@ -11,47 +11,46 @@ env:
   RESOURCE_GROUP: ubigu-exercise
 
 jobs:
-#   test:
-#     name: Test
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-#       - name: Setup Node.js
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: '18'
-#           cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-#       - name: Cache Cypress binary
-#         uses: actions/cache@v3
-#         id: cypress-cache
-#         with:
-#           path: ~/.cache/Cypress
-#           key: cypress-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
-#           restore-keys: |
-#             cypress-${{ runner.os }}-
+      - name: Cache Cypress binary
+        uses: actions/cache@v3
+        id: cypress-cache
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            cypress-${{ runner.os }}-
 
-#       # Start only the client service since we're just testing the frontend
-#       - name: Start frontend service
-#         run: |
-#           docker compose up -d client
-#           docker compose ps
-#           echo "Waiting for frontend to initialize..."
-#           sleep 15
+      - name: Start frontend service
+        run: |
+          docker compose up -d client
+          docker compose ps
+          echo "Waiting for frontend to initialize..."
+          sleep 15
 
-#       # Run Cypress tests against the frontend only
-#       - name: Cypress run
-#         uses: cypress-io/github-action@v5
-#         with:
-#           spec: cypress/e2e/hedgehog-form.cy.js
-#           wait-on: 'http://localhost:8080'
-#           wait-on-timeout: 60
-#           install: true
+      - name: Cypress run
+        uses: cypress-io/github-action@v5
+        with:
+          spec: cypress/e2e/hedgehog-form.cy.js
+          wait-on: 'http://localhost:8080'
+          wait-on-timeout: 60
+          install: true
+
   build-and-deploy:
     name: Build and Deploy
-    # needs: test
+    needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -62,18 +61,6 @@ jobs:
         driver: docker-container
         buildkitd-flags: --debug
         install: true
-
-    - name: Show Buildx builders
-      run: docker buildx ls
-
-    - name: Debug GitHub Context
-      run: |
-        echo "Running on branch: ${{ github.ref }}"
-        echo "ACR_REGISTRY value: ${{ env.ACR_REGISTRY }}"
-        echo "APP_NAME value: ${{ env.APP_NAME }}"
-
-    - name: Debug AZURE_CREDENTIALS
-      run: echo "${{ secrets.AZURE_CREDENTIALS }}"
 
     - name: Login to Azure
       uses: azure/login@v1

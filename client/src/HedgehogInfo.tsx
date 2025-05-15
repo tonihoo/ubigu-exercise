@@ -16,7 +16,6 @@ interface Hedgehog {
   };
 }
 
-// Gender translation map
 const genderTranslations: Record<string, string> = {
   female: 'Naaras',
   male: 'Uros',
@@ -66,7 +65,7 @@ export function HedgehogInfo({ hedgehogId }: Props) {
       data-cy="hedgehog-detail"
     >
       {loading ? (
-        <Typography>Loading...</Typography>
+        <Typography>TallennetaanLoading...</Typography>
       ) : hedgehog ? (
         <>
           <Typography variant="h6">{hedgehog.name}</Typography>
