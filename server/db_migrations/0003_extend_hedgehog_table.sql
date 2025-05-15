@@ -8,4 +8,6 @@ ALTER TABLE hedgehog
   ADD COLUMN gender hedgehog_gender NOT NULL,
   ADD COLUMN location GEOMETRY(Point, 3067) NOT NULL;
 
+COMMENT ON COLUMN hedgehog.location IS 'Location of hedgehogs in ETRS89-TM35FIN (EPSG:3067)';
+
 CREATE INDEX hedgehog_location_idx ON hedgehog USING GIST (location);
