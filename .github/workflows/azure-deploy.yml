@@ -24,6 +24,12 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
+      - name: Run backend tests
+        run: |
+          cd server
+          npm ci
+          npm test
+
       - name: Cache Cypress binary
         uses: actions/cache@v3
         id: cypress-cache
@@ -33,16 +39,15 @@ jobs:
           restore-keys: |
             cypress-${{ runner.os }}-
 
-      - name: Start frontend service
+      - name: Start application services
         run: |
-          docker compose up -d client
+          docker compose up -d
           docker compose ps
-          echo "Waiting for frontend to initialize..."
-          sleep 15
 
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
+          working-directory: client
           spec: cypress/e2e/hedgehog-form.cy.js
           wait-on: 'http://localhost:8080'
           wait-on-timeout: 60
