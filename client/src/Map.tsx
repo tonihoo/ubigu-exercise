@@ -12,6 +12,7 @@ import Style from "ol/style/Style";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
+import { FeatureLike } from 'ol/Feature';
 
 // Define the Finnish coordinate system
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs");
@@ -25,6 +26,30 @@ interface Props {
 
 export function Map({ children, onMapClick, features }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
+
+  const styleFunction = (feature: FeatureLike) => {
+    const featureType = feature.get('featureType');
+
+    if (featureType === 'clickLocation') {
+      // Orange style for click locations
+      return new Style({
+        image: new Circle({
+          radius: 8,
+          fill: new Fill({ color: "#FF6B35" }),
+          stroke: new Stroke({ color: "#E55100", width: 3 }),
+        }),
+      });
+    } else {
+      // Default style for hedgehogs
+      return new Style({
+        image: new Circle({
+          radius: 7,
+          fill: new Fill({ color: "#00B2A0" }),
+          stroke: new Stroke({ color: "darkblue", width: 3 }),
+        }),
+      });
+    }
+  };
 
   /**
    * OpenLayers View: @see https://openlayers.org/en/latest/apidoc/module-ol_View-View.html
@@ -56,13 +81,7 @@ export function Map({ children, onMapClick, features }: Props) {
         }),
         new VectorLayer({
           source: new VectorSource(),
-          style: new Style({
-            image: new Circle({
-              radius: 7,
-              fill: new Fill({ color: "#00B2A0" }),
-              stroke: new Stroke({ color: "darkblue", width: 3 }),
-            }),
-          }),
+          style: styleFunction,
         }),
       ],
     });
@@ -75,12 +94,11 @@ export function Map({ children, onMapClick, features }: Props) {
     olMap.on("click", (event) => {
       onMapClick(event.coordinate);
     });
-  }, [olMap]);
+  }, [olMap, onMapClick]);
 
   /** Listen for changes in the 'features' property */
   useEffect(() => {
     const layers = olMap.getLayers().getArray();
-
     const source = (layers[1] as VectorLayer<VectorSource>).getSource();
 
     // Clear existing features
@@ -90,12 +108,21 @@ export function Map({ children, onMapClick, features }: Props) {
     if (!features || !features.length) return;
 
     // Add new features
-    const olFeatures = features.map(
-      (geometry) =>
-        new Feature({
-          geometry: new GeoJSON().readGeometry(geometry.geometry),
-        })
-    );
+    const olFeatures = features.map((geoJsonFeature) => {
+      const olFeature = new Feature({
+        geometry: new GeoJSON().readGeometry(geoJsonFeature.geometry),
+      });
+
+      // Copy properties to the OpenLayers feature
+      if (geoJsonFeature.properties) {
+        Object.keys(geoJsonFeature.properties).forEach(key => {
+          olFeature.set(key, geoJsonFeature.properties?.[key]);
+        });
+      }
+
+      return olFeature;
+    });
+
     source?.addFeatures(olFeatures);
   }, [features]);
 

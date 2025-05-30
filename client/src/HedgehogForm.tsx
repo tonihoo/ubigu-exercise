@@ -1,9 +1,10 @@
 import { Paper, Typography, TextField, Button, Box, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, Alert } from "@mui/material";
 import { useState, useEffect } from "react";
+import { Hedgehog } from "@shared/hedgehog";
 
 interface Props {
   coordinates: number[];
-  onHedgehogAdded?: () => void;
+  onHedgehogAdded?: (hedgehog: Hedgehog) => void;
 }
 
 interface FormData {
@@ -90,6 +91,8 @@ export function HedgehogForm({ coordinates, onHedgehogAdded }: Props) {
       newErrors.age = "Lisää ikä";
     } else if (isNaN(Number(formData.age)) || Number(formData.age) < 0) {
       newErrors.age = "Ikä täytyy olla positiivinen numero tai nolla";
+    } else if (Number(formData.age) > 15) {
+      newErrors.age = "Ikä ei voi olla yli 15 vuotta";
     }
 
     if (!formData.gender) {
@@ -107,9 +110,7 @@ export function HedgehogForm({ coordinates, onHedgehogAdded }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
     setSubmitSuccess(false);
@@ -117,43 +118,46 @@ export function HedgehogForm({ coordinates, onHedgehogAdded }: Props) {
     try {
       const hedgehogData = {
         name: formData.name,
-        age: Number(formData.age),
+        age: parseInt(formData.age),
         gender: formData.gender,
         location: {
-          type: "Point",
+          type: "Point" as const,
           coordinates: coordinates
         }
       };
 
-      const response = await fetch('/api/v1/hedgehog', {
-        method: 'POST',
+      const response = await fetch("/api/v1/hedgehog", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(hedgehogData),
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        const result = await response.json();
+
+        setSubmitSuccess(true);
+
+        // Reset form
+        setFormData({ name: "", age: "", gender: "" });
+        setErrors({});
+
+        // Pass the created hedgehog data to parent
+        if (onHedgehogAdded && result.hedgehog) {
+          onHedgehogAdded(result.hedgehog);
+        }
+      } else {
         const errorData = await response.json();
-        console.error("Validation error details:", errorData.details);
-        throw new Error(errorData.message || 'Failed to create hedgehog');
-      }
-
-      // Reset the form on success
-      setFormData({
-        name: "",
-        age: "",
-        gender: "",
-      });
-      setLocationSelected(false);
-      setSubmitSuccess(true);
-
-      // Notify parent component to refresh the list
-      if (onHedgehogAdded) {
-        onHedgehogAdded();
+        setErrors({
+          location: errorData.message || "Virhe tallentaessa tietoja"
+        });
       }
     } catch (error) {
-      console.error("Error submitting hedgehog data:", error);
+      console.error("Error submitting form:", error);
+      setErrors({
+        location: "Verkkovirhe. Yritä uudelleen."
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -200,7 +204,7 @@ export function HedgehogForm({ coordinates, onHedgehogAdded }: Props) {
           label="Ikä"
           name="age"
           type="number"
-          inputProps={{ min: 0 }}
+          inputProps={{ min: 0, max: 15 }}
           value={formData.age}
           onChange={handleInputChange}
           error={!!errors.age}

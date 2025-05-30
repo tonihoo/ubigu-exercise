@@ -74,7 +74,10 @@ export function hedgehogRouter(
       }
 
       const newHedgehog = await createHedgehog(request.body as any);
-      return reply.code(201).send({ hedgehog: newHedgehog });
+      return reply.code(201).send({
+        hedgehog: newHedgehog,
+        message: "Hedgehog created successfully"
+      });
     } catch (error: unknown) {
       request.log.error(error);
       return reply.code(500).send({
