@@ -1,4 +1,4 @@
-import { Paper, Typography, TextField, Button, Box, FormControl, InputLabel, Select, MenuItem, FormHelperText, SelectChangeEvent, Alert } from "@mui/material";
+import { Paper, Typography, TextField, Button, Box, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText, Alert } from "@mui/material";
 import { useState, useEffect } from "react";
 
 interface Props {
@@ -62,19 +62,19 @@ export function HedgehogForm({ coordinates, onHedgehogAdded }: Props) {
     }
   };
 
-  // Handler for Select (dropdown) component
-  const handleSelectChange = (e: SelectChangeEvent) => {
+  // Handler for radio button changes
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name as string]: value
+      [name]: value
     });
 
     // Clear error when field is edited
     if (errors[name as keyof FormErrors]) {
       setErrors({
         ...errors,
-        [name as string]: undefined
+        [name]: undefined
       });
     }
   };
@@ -209,25 +209,36 @@ export function HedgehogForm({ coordinates, onHedgehogAdded }: Props) {
         />
 
         <FormControl
-          fullWidth
+          component="fieldset"
           margin="normal"
           required
           error={!!errors.gender}
           disabled={isSubmitting}
+          sx={{ mt: 2, mb: 1 }}
         >
-          <InputLabel id="gender-label">Sukupuoli</InputLabel>
-          <Select
-            labelId="gender-label"
-            id="gender"
+          <FormLabel component="legend">Sukupuoli</FormLabel>
+          <RadioGroup
             name="gender"
             value={formData.gender}
-            label="Sukupuoli"
-            onChange={handleSelectChange}
+            onChange={handleRadioChange}
+            row
           >
-            <MenuItem value="female">Naaras</MenuItem>
-            <MenuItem value="male">Uros</MenuItem>
-            <MenuItem value="unknown">Tuntematon</MenuItem>
-          </Select>
+            <FormControlLabel
+              value="female"
+              control={<Radio />}
+              label="Naaras"
+            />
+            <FormControlLabel
+              value="male"
+              control={<Radio />}
+              label="Uros"
+            />
+            <FormControlLabel
+              value="unknown"
+              control={<Radio />}
+              label="Tuntematon"
+            />
+          </RadioGroup>
           {errors.gender && <FormHelperText>{errors.gender}</FormHelperText>}
         </FormControl>
 
