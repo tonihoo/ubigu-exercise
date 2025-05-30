@@ -65,13 +65,13 @@ export function HedgehogInfo({ hedgehogId }: Props) {
       data-cy="hedgehog-detail"
     >
       {loading ? (
-        <Typography>TallennetaanLoading...</Typography>
+        <Typography>Ladataan...</Typography>
       ) : hedgehog ? (
         <>
           <Typography variant="h6">{hedgehog.name}</Typography>
           <Typography data-cy="hedgehog-age-display">Ikä: {hedgehog.age}</Typography>
           <Typography data-cy="hedgehog-gender-display">
-            Sukupuoli: {genderTranslations[hedgehog.gender] || hedgehog.gender}
+            Sukupuoli: {genderTranslations[hedgehog.gender]}
           </Typography>
           <Typography>
             Sijainti: E {hedgehog.location.coordinates[0].toFixed(0)}, N {hedgehog.location.coordinates[1].toFixed(0)}
