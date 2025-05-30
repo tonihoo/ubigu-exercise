@@ -67,3 +67,15 @@ Toteuta komponetti `<HedgehogForm>`, jossa uusia siilihavaintoja voidaan rekiste
 Toteutettavat varsinaiset toiminnallisuudet on tarkoituksella tehty melko suppeiksi, jotta näihin ei menisi liian paljon aikaa. Toiminnallisuuksien lisäksi toteutus tulisi saa julkistettua siten, että se on julkisessa Internetissä saatavilla. Esimerkiksi isoimmat pilvipalveluiden tarjoajat tarjoavat ilmaisia ajoympäristöjä, joihin sovelluksen voi pystyttää. Tällä mittaammme koodipähkinän suorittajien yleistä devops -osaamista.
 
 Lisäksi mikäli kaikki yllä oleva sujuu joutuisasti, haluaisimme nähdä sovelluksen jollekin osalle kirjoitettavan testejä. Testit voivat olla toteutettuna millä tahansa kirjastolla ja ne voivat liittyä mihin tahansa sovelluksen osaan (esim. E2E-testit, backendin yksikkötestit jne.).
+
+## Testien ajaminen
+
+```sh
+# Backend-testit (Jest)
+cd server
+npm run test
+
+# Frontend-testit (Cypress)
+cd client
+npx cypress open # -> E2E testing -> Start E2E testing in Chrome -> hedgehog-form
+```

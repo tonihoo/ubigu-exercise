@@ -4,17 +4,15 @@ describe("Hedgehog Form", () => {
 
     cy.get("#name").should("exist");
     cy.get("#age").should("exist");
-    cy.get("#gender").should("exist");
+    cy.get('input[name="gender"]').should("exist");
 
     // Fill in the form
     const hedgehogName = "Testi Siili";
-    const hedgehogGender = "Uros";
+    const hedgehogGender = "male";
     const hedgehogAge = "3";
     cy.get("#name").type(hedgehogName);
     cy.get("#age").type(hedgehogAge);
-    cy.get("#gender").click();
-    cy.get(".MuiMenu-paper").should("be.visible"); // Wait for dropdown to appear
-    cy.get(".MuiMenuItem-root").contains(hedgehogGender).click();
+    cy.get(`input[name="gender"][value="${hedgehogGender}"]`).click();
 
     // Make sure the map is loaded
     cy.get(".ol-layer canvas")
