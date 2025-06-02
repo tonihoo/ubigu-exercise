@@ -13,6 +13,7 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { register } from 'ol/proj/proj4';
 import proj4 from 'proj4';
 import { FeatureLike } from 'ol/Feature';
+import { Zoom } from 'ol/control';
 
 // Define the Finnish coordinate system
 proj4.defs("EPSG:3067", "+proj=utm +zone=35 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs");
@@ -54,14 +55,18 @@ export function Map({ children, onMapClick, features }: Props) {
   /**
    * OpenLayers View: @see https://openlayers.org/en/latest/apidoc/module-ol_View-View.html
    * View's projection is defined based on the target country (area): E.g. EPSG:3067 in Finland
+   * Extent values are in ETRS-TM35FIN (EPSG:3067) coordinates covering Finland
    */
   const [olView] = useState(() => {
     return new View({
-      center: [460000, 7125000],
+      center: [460000, 7130000],
       zoom: 7,
       projection: 'EPSG:3067',
       multiWorld: false,
       enableRotation: false,
+      // Restrict view to Finland's boundaries in EPSG:3067 coordinates
+      extent: [20000, 6550000, 900000, 7850000],
+      maxZoom: 18,
     });
   });
 
@@ -72,7 +77,11 @@ export function Map({ children, onMapClick, features }: Props) {
   const [olMap] = useState(() => {
     return new OlMap({
       target: "",
-      controls: [],
+      controls: [
+        new Zoom({
+          className: 'ol-zoom'
+        })
+      ],
       view: olView,
       keyboardEventTarget: document,
       layers: [
@@ -128,11 +137,21 @@ export function Map({ children, onMapClick, features }: Props) {
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      {/* Styles for the OpenLayers ScaleLine -component */}
+      {/* Styles for the OpenLayers controls */}
       <GlobalStyles
         styles={{
           ".ol-viewport": {
             cursor: "pointer",
+          },
+          ".ol-zoom": {
+            position: "absolute",
+            top: "65px",
+            left: "8px",
+            background: "rgba(255,255,255,0.4)",
+            borderRadius: "4px",
+            padding: "2px",
+            display: "flex",
+            flexDirection: "column",
           },
         }}
       />
