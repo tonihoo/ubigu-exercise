@@ -78,7 +78,7 @@ export function HedgehogInfo({ hedgehogId }: Props) {
           </Typography>
         </>
       ) : (
-        <Typography>Valitse siili yllä olevasta listasta</Typography>
+        <Typography>Valitse siili vasemmalla olevasta listasta</Typography>
       )}
     </Paper>
   );
