@@ -107,7 +107,23 @@ export function App() {
 
   return (
     <>
-      <Container maxWidth={false} sx={{ height: "100vh", p: 1, paddingBottom: "60px" }}>
+      {/* Header */}
+      <Box
+        sx={{
+          backgroundColor: "#00B2A0",
+          color: "white",
+          paddingY: "0.25rem", // Only vertical padding
+          paddingX: "1rem",    // Keep horizontal padding for text spacing
+          textAlign: "center",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+        }}
+      >
+        <Typography variant="overline" component="h1">
+          Siilit kartalla
+        </Typography>
+      </Box>
+
+      <Container maxWidth={false} sx={{ height: "calc(100vh - 120px)", p: 1 }}>
         <Grid container spacing={1} sx={{ height: "100%" }}>
           <Grid item xs={12} md={3}>
             <HedgehogList
@@ -136,6 +152,8 @@ export function App() {
           </Grid>
         </Grid>
       </Container>
+
+      {/* Footer */}
       <Box
         sx={{
           position: "fixed",
