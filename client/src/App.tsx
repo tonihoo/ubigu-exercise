@@ -106,65 +106,55 @@ export function App() {
   }
 
   return (
-    <Container maxWidth={false} sx={{ height: "100vh", p: 1 }}>
-      <Box
-        sx={{
-          backgroundColor: "#00B2A0",
-          height: "40px",
-          width: "100%",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography sx={{ color: "white" }} variant="overline">
-          Siilit kartalla
-        </Typography>
-      </Box>
-      <Grid container spacing={1} sx={{ height: "100%" }}>
-        <Grid item xs={12} md={3}>
-          <Grid container direction="column" spacing={1} sx={{ height: "100%" }}>
-            <Grid item xs>
-              <HedgehogList
-                onSelectHedgehog={handleHedgehogSelect}
-                selectedHedgehogId={selectedHedgehogId}
-                refreshTrigger={refreshTrigger}
-              />
-            </Grid>
-            <Grid item>
-              <HedgehogInfo hedgehogId={selectedHedgehogId} />
+    <>
+      <Container maxWidth={false} sx={{ height: "100vh", p: 1, paddingBottom: "60px" }}>
+        <Grid container spacing={1} sx={{ height: "100%" }}>
+          <Grid item xs={12} md={3}>
+            <HedgehogList
+              onSelectHedgehog={handleHedgehogSelect}
+              selectedHedgehogId={selectedHedgehogId}
+              refreshTrigger={refreshTrigger}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper elevation={3} sx={{ height: "100%" }}>
+              <Map features={mapFeatures} onMapClick={handleMapClick} />
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={3}>
+            <Grid container direction="column" spacing={1} sx={{ height: "100%" }}>
+              <Grid item>
+                <HedgehogForm
+                  coordinates={coordinates}
+                  onHedgehogAdded={handleHedgehogAdded}
+                />
+              </Grid>
+              <Grid item xs>
+                <HedgehogInfo hedgehogId={selectedHedgehogId} />
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ height: "100%" }}>
-            <Map features={mapFeatures} onMapClick={handleMapClick} />
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <HedgehogForm
-            coordinates={coordinates}
-            onHedgehogAdded={handleHedgehogAdded}
-          />
-        </Grid>
-      </Grid>
+      </Container>
       <Box
         sx={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
           backgroundColor: "#00B2A0",
           height: "40px",
-          width: "100%",
           display: "flex",
-          flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
+          zIndex: 1000,
+          boxShadow: "0 -2px 4px rgba(0,0,0,0.1)"
         }}
       >
-        {" "}
         <Typography sx={{ color: "white" }} variant="overline">
           Powered by Ubigu Oy
         </Typography>
       </Box>
-    </Container>
+    </>
   );
 }
